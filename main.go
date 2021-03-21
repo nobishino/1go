@@ -4,7 +4,8 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"strconv"
+
+	"github.com/nobishino/1go/c"
 )
 
 func main() {
@@ -12,13 +13,5 @@ func main() {
 		log.Println("引数の個数が不正です")
 		os.Exit(1)
 	}
-	fmt.Println(".intel_syntax noprefix")
-	fmt.Println(".globl main")
-	fmt.Println("main:")
-	digit, err := strconv.Atoi(os.Args[1])
-	if err != nil {
-		panic(err)
-	}
-	fmt.Printf("    mov rax, %d\n", digit)
-	fmt.Println("    ret")
+	fmt.Fprint(os.Stdout, c.Compile(os.Args[1]))
 }

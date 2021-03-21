@@ -3,7 +3,7 @@ assert() {
   expected="$1"
   input="$2"
 
-  ./1go "$input" > tmp.s
+  ./main "$input" > tmp.s
   cc -o tmp tmp.s
   ./tmp
   actual="$?"
@@ -18,5 +18,7 @@ assert() {
 
 assert 0 0
 assert 42 42
+assert 9 4+5
+assert 13 4+21-12
 
 echo OK
