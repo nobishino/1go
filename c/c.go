@@ -3,6 +3,7 @@ package c
 import (
 	"bytes"
 	"fmt"
+	"strings"
 )
 
 // Compile compiles source code and returns assembly code
@@ -53,6 +54,7 @@ func Tokenize(src string) []string {
 			token = string(s[i:j])
 		}
 		i = j
+		token = strings.Trim(token, " ")
 		result = append(result, token)
 	}
 	return result
