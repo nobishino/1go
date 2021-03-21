@@ -21,6 +21,21 @@ func TestTokenize(t *testing.T) {
 			in:     "5",
 			expect: []string{"5"},
 		},
+		{
+			title:  "2 terms#1",
+			in:     "5+3",
+			expect: []string{"5", "+", "3"},
+		},
+		{
+			title:  "2 terms#2",
+			in:     "5-31",
+			expect: []string{"5", "-", "31"},
+		},
+		{
+			title:  "3 terms",
+			in:     "5+13-4",
+			expect: []string{"5", "+", "13", "-", "4"},
+		},
 	}
 	for _, tt := range testcases {
 		t.Run(tt.title, func(t *testing.T) {
