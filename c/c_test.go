@@ -44,7 +44,10 @@ func TestTokenize(t *testing.T) {
 	}
 	for _, tt := range testcases {
 		t.Run(tt.title, func(t *testing.T) {
-			got := c.Tokenize(tt.in)
+			got, err := c.Tokenize(tt.in)
+			if err != nil {
+				t.Errorf("error should be nil but got %v", err)
+			}
 			if diff := cmp.Diff(got, tt.expect); diff != "" {
 				t.Errorf("differs: (-got +expect)\n%s", diff)
 			}
@@ -63,7 +66,10 @@ func TestAddSub(t *testing.T) {
 		},
 	}
 	for _, tt := range testcases {
-		got := c.Compile(tt.in)
+		got, err := c.Compile(tt.in)
+		if err != nil {
+			t.Errorf("error should be nil but got %v", err)
+		}
 		expect := readTestFile(t, tt.expect)
 		if got != expect {
 			t.Errorf("\n[expect]\n%s\n[got]\n%s", expect, got)

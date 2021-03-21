@@ -13,5 +13,10 @@ func main() {
 		log.Println("引数の個数が不正です")
 		os.Exit(1)
 	}
-	fmt.Fprint(os.Stdout, c.Compile(os.Args[1]))
+	asm, err := c.Compile(os.Args[1])
+	if err != nil {
+		log.Print(err)
+		os.Exit(1)
+	}
+	fmt.Fprint(os.Stdout, asm)
 }
