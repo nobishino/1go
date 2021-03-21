@@ -1,16 +1,31 @@
 package c
 
+import (
+	"bytes"
+	"fmt"
+)
+
 // Compile compiles source code and returns assembly code
 func Compile(src string) string {
-	return `.intel_syntax noprefix
-.globl main
-
-main:
-    mov rax, 5
-    add rax, 20
-    sub rax, 4
-    ret
-`
+	buf := new(bytes.Buffer)
+	fmt.Fprintln(buf, ".intel_syntax noprefix")
+	fmt.Fprintln(buf, ".globl main")
+	fmt.Fprintln(buf, "")
+	fmt.Fprintln(buf, "main:")
+	op := "mov"
+	tokens := Tokenize(src)
+	for _, token := range tokens {
+		switch token {
+		case "+":
+			op = "add"
+		case "-":
+			op = "sub"
+		default: // digit token
+			fmt.Fprintf(buf, "    %s rax, %s\n", op, token)
+		}
+	}
+	fmt.Fprintln(buf, "    ret")
+	return buf.String()
 }
 
 func Tokenize(src string) []string {
