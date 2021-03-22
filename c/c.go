@@ -2,6 +2,7 @@ package c
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"strings"
 )
@@ -33,6 +34,9 @@ func Compile(src string) (string, error) {
 }
 
 func Tokenize(src string) ([]string, error) {
+	if err := Validate(src); err != nil {
+		return nil, err
+	}
 	isOp := func(r rune) bool {
 		operators := []rune{'+', '-'}
 		for _, op := range operators {
@@ -61,4 +65,23 @@ func Tokenize(src string) ([]string, error) {
 		result = append(result, token)
 	}
 	return result, nil
+}
+
+func Validate(src string) error {
+	isValid := func(r rune) bool {
+		validChars := []rune{'+', '-', '-', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', ' '}
+		for _, c := range validChars {
+			if c == r {
+				return true
+			}
+		}
+		return false
+	}
+	for i, r := range src {
+		if !isValid(r) {
+			markerLine := strings.Repeat(" ", i) + "^"
+			return errors.New(fmt.Sprintf("invalid character at %d\n%s\n%s", i+1, src, markerLine))
+		}
+	}
+	return nil
 }

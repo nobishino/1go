@@ -53,6 +53,82 @@ func TestTokenize(t *testing.T) {
 			}
 		})
 	}
+	t.Run("Invalid Input", func(t *testing.T) {
+		testcases := [...]struct {
+			title string
+			in    string
+		}{
+			{
+				title: "invalid character",
+				in:    "f",
+			},
+		}
+		for _, tt := range testcases {
+			t.Run(tt.title, func(t *testing.T) {
+				_, err := c.Tokenize(tt.in)
+				if err == nil {
+					t.Fatal("error should not be nil but got nil")
+				}
+			})
+		}
+	})
+}
+
+func TestValidate(t *testing.T) {
+	t.Run("Valid Input", func(t *testing.T) {
+		testcases := [...]struct {
+			title string
+			in    string
+		}{
+			{
+				title: "only digits",
+				in:    "456",
+			},
+			{
+				title: "has space",
+				in:    "4 5 6",
+			},
+			{
+				title: "mixture",
+				in:    "4 + 50 - 6",
+			},
+		}
+		for _, tt := range testcases {
+			t.Run(tt.title, func(t *testing.T) {
+				err := c.Validate(tt.in)
+				if err != nil {
+					t.Errorf("expect err to be nil, but got %v", err)
+				}
+			})
+		}
+	})
+	t.Run("Invalid Input", func(t *testing.T) {
+		testcases := [...]struct {
+			title  string
+			in     string
+			errMsg string
+		}{
+			{
+				title: "latin",
+				in:    "a",
+				errMsg: `invalid character at 1
+a
+^`,
+			},
+		}
+		for _, tt := range testcases {
+			t.Run(tt.title, func(t *testing.T) {
+				err := c.Validate(tt.in)
+				if err == nil {
+					t.Fatal("expect err not to be nil, but got nil")
+				}
+				gotErrMsg := err.Error()
+				if gotErrMsg != tt.errMsg {
+					t.Errorf("expect error message %q, but got %q", tt.errMsg, gotErrMsg)
+				}
+			})
+		}
+	})
 }
 
 func TestAddSub(t *testing.T) {
