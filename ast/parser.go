@@ -21,16 +21,22 @@ func (p *Parser) expr() (*Node, error) {
 	if err != nil {
 		return nil, err
 	}
-	if p.consume("+") {
+	if !p.hasNext() {
+		return node, nil
+	} else if p.consume("+") {
 		rhs, err := p.expr()
 		if err != nil {
 			return nil, err
 		}
 		return NewNode(Add, node, rhs), nil
-	} else if !p.hasNext() {
-		return node, nil
+	} else if p.consume("-") {
+		rhs, err := p.expr()
+		if err != nil {
+			return nil, err
+		}
+		return NewNode(Sub, node, rhs), nil
 	} else {
-		return nil, xerrors.New("parse failed")
+		return nil, xerrors.Errorf("parse failed at token #%v: %s", p.loc+1, p.current())
 	}
 }
 

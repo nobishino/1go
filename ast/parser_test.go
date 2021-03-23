@@ -36,6 +36,21 @@ func TestParser(t *testing.T) {
 				},
 			},
 		},
+		{
+			title:  "difference of 2 numbers",
+			tokens: []string{"10", "-", "8"},
+			expect: &ast.Node{
+				Kind: ast.Sub,
+				Lhs: &ast.Node{
+					Kind:  ast.Num,
+					Value: 10,
+				},
+				Rhs: &ast.Node{
+					Kind:  ast.Num,
+					Value: 8,
+				},
+			},
+		},
 	}
 	for _, tt := range testcases {
 		t.Run(tt.title, func(t *testing.T) {
