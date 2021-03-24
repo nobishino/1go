@@ -204,6 +204,34 @@ func TestCompileAST(t *testing.T) {
 				"    pop rax",
 				"    add rax rdx",
 				"    push rax",
+				"    ret",
+			},
+		},
+		{
+			title: "2-1",
+			in: &ast.Node{
+				Kind: ast.Sub,
+				Lhs: &ast.Node{
+					Kind:  ast.Num,
+					Value: 2,
+				},
+				Rhs: &ast.Node{
+					Kind:  ast.Num,
+					Value: 1,
+				},
+			},
+			expect: []string{
+				".intel_syntax noprefix",
+				".globl main",
+				"",
+				"main:",
+				"    push 2",
+				"    push 1",
+				"    pop rdi",
+				"    pop rax",
+				"    sub rax rdx",
+				"    push rax",
+				"    ret",
 			},
 		},
 	}

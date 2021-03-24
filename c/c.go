@@ -99,6 +99,7 @@ func CompileAST(node *ast.Node) []string {
 		"main:",
 	}
 	result = append(result, genAST(node)...)
+	result = append(result, "    ret")
 	return result
 }
 
@@ -113,6 +114,8 @@ func genAST(node *ast.Node) []string {
 	switch node.Kind {
 	case ast.Add:
 		result = append(result, add...)
+	case ast.Sub:
+		result = append(result, sub...)
 	case ast.Num:
 		result = append(result, fmt.Sprintf("    push %d", node.Value))
 	}
@@ -130,5 +133,11 @@ var add = []string{
 	"    pop rdi",
 	"    pop rax",
 	"    add rax rdx",
+	"    push rax",
+}
+var sub = []string{
+	"    pop rdi",
+	"    pop rax",
+	"    sub rax rdx",
 	"    push rax",
 }
