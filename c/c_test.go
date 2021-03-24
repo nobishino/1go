@@ -7,6 +7,7 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 
+	"github.com/nobishino/1go/ast"
 	"github.com/nobishino/1go/c"
 )
 
@@ -166,4 +167,52 @@ func readTestFile(t *testing.T, path string) string {
 		t.Fatal(err)
 	}
 	return string(s)
+}
+
+func TestCompileAST(t *testing.T) {
+	testcases := [...]struct {
+		title  string
+		in     *ast.Node
+		expect []string
+	}{
+		{
+			title:  "nil",
+			in:     nil,
+			expect: nil,
+		},
+		{
+			title: "1+2",
+			in: &ast.Node{
+				Kind: ast.Add,
+				Lhs: &ast.Node{
+					Kind:  ast.Num,
+					Value: 1,
+				},
+				Rhs: &ast.Node{
+					Kind:  ast.Num,
+					Value: 2,
+				},
+			},
+			expect: []string{
+				".intel_syntax noprefix",
+				".globl main",
+				"",
+				"main:",
+				"    push 1",
+				"    push 2",
+				"    pop rdi",
+				"    pop rax",
+				"    add rax rdx",
+				"    push rax",
+			},
+		},
+	}
+	for _, tt := range testcases {
+		t.Run(tt.title, func(t *testing.T) {
+			got := c.CompileAST(tt.in)
+			if diff := cmp.Diff(got, tt.expect); diff != "" {
+				t.Errorf("differs: (-got +expect)\n%s", diff)
+			}
+		})
+	}
 }

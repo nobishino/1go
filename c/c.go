@@ -5,6 +5,8 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+
+	"github.com/nobishino/1go/ast"
 )
 
 // Compile compiles source code and returns assembly code
@@ -84,4 +86,49 @@ func Validate(src string) error {
 		}
 	}
 	return nil
+}
+
+func CompileAST(node *ast.Node) []string {
+	if node == nil {
+		return nil
+	}
+	result := []string{
+		".intel_syntax noprefix",
+		".globl main",
+		"",
+		"main:",
+	}
+	result = append(result, genAST(node)...)
+	return result
+}
+
+func genAST(node *ast.Node) []string {
+	if node == nil {
+		return nil
+	}
+	var result []string
+	result = append(result, genAST(node.Lhs)...)
+	result = append(result, genAST(node.Rhs)...)
+
+	switch node.Kind {
+	case ast.Add:
+		result = append(result, add...)
+	case ast.Num:
+		result = append(result, fmt.Sprintf("    push %d", node.Value))
+	}
+	return result
+}
+
+var headers = []string{
+	".intel_syntax noprefix",
+	".globl main",
+	"",
+	"main:",
+}
+
+var add = []string{
+	"    pop rdi",
+	"    pop rax",
+	"    add rax rdx",
+	"    push rax",
 }
