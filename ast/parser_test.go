@@ -51,6 +51,72 @@ func TestParser(t *testing.T) {
 				},
 			},
 		},
+		{
+			title:  "4 + 21 - 12",
+			tokens: []string{"4", "+", "21", "-", "12"},
+			expect: &ast.Node{
+				Kind: ast.Add,
+				Lhs: &ast.Node{
+					Kind:  ast.Num,
+					Value: 4,
+				},
+				Rhs: &ast.Node{
+					Kind: ast.Sub,
+					Lhs: &ast.Node{
+						Kind:  ast.Num,
+						Value: 21,
+					},
+					Rhs: &ast.Node{
+						Kind:  ast.Num,
+						Value: 12,
+					},
+				},
+			},
+		},
+		{
+			title:  "1 + 2 * 3",
+			tokens: []string{"1", "+", "2", "*", "3"},
+			expect: &ast.Node{
+				Kind: ast.Add,
+				Lhs: &ast.Node{
+					Kind:  ast.Num,
+					Value: 1,
+				},
+				Rhs: &ast.Node{
+					Kind: ast.Mul,
+					Lhs: &ast.Node{
+						Kind:  ast.Num,
+						Value: 2,
+					},
+					Rhs: &ast.Node{
+						Kind:  ast.Num,
+						Value: 3,
+					},
+				},
+			},
+		},
+		{
+			title:  "1 + 2 / 3",
+			tokens: []string{"1", "+", "2", "/", "3"},
+			expect: &ast.Node{
+				Kind: ast.Add,
+				Lhs: &ast.Node{
+					Kind:  ast.Num,
+					Value: 1,
+				},
+				Rhs: &ast.Node{
+					Kind: ast.Div,
+					Lhs: &ast.Node{
+						Kind:  ast.Num,
+						Value: 2,
+					},
+					Rhs: &ast.Node{
+						Kind:  ast.Num,
+						Value: 3,
+					},
+				},
+			},
+		},
 	}
 	for _, tt := range testcases {
 		t.Run(tt.title, func(t *testing.T) {
@@ -59,7 +125,7 @@ func TestParser(t *testing.T) {
 				t.Fatalf("expect error to be nil but got %v", err)
 			}
 			if diff := cmp.Diff(got, tt.expect); diff != "" {
-				t.Errorf("differs: (-got +expect)\n%s", diff)
+				t.Errorf("differs: (-got +expect)\n%s\ninput = %v", diff, tt.tokens)
 			}
 		})
 	}

@@ -54,7 +54,7 @@ func Tokenize(src string) ([]string, error) {
 		return nil, err
 	}
 	isOp := func(r rune) bool {
-		operators := []rune{'+', '-'}
+		operators := []rune{'+', '-', '*', '/'}
 		for _, op := range operators {
 			if r == op {
 				return true
@@ -85,7 +85,7 @@ func Tokenize(src string) ([]string, error) {
 
 func Validate(src string) error {
 	isValid := func(r rune) bool {
-		validChars := []rune{'+', '-', '-', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', ' '}
+		validChars := []rune{'+', '-', '*', '/', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', ' '}
 		for _, c := range validChars {
 			if c == r {
 				return true
@@ -133,6 +133,10 @@ func genAST(node *ast.Node) []string {
 		result = append(result, add...)
 	case ast.Sub:
 		result = append(result, sub...)
+	case ast.Mul:
+		result = append(result, mul...)
+	case ast.Div:
+		result = append(result, div...)
 	case ast.Num:
 		result = append(result, fmt.Sprintf("    push %d", node.Value))
 	}
@@ -156,5 +160,20 @@ var sub = []string{
 	"    pop rdi",
 	"    pop rax",
 	"    sub rax, rdi",
+	"    push rax",
+}
+
+var mul = []string{
+	"    pop rdi",
+	"    pop rax",
+	"    imul rax, rdi",
+	"    push rax",
+}
+
+var div = []string{
+	"    pop rdi",
+	"    pop rax",
+	"    cqo",
+	"    idiv rdi",
 	"    push rax",
 }

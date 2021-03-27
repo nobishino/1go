@@ -42,6 +42,16 @@ func TestTokenize(t *testing.T) {
 			in:     " 5 + 13 - 4",
 			expect: []string{"5", "+", "13", "-", "4"},
 		},
+		{
+			title:  "*",
+			in:     "1 + 2 * 3",
+			expect: []string{"1", "+", "2", "*", "3"},
+		},
+		{
+			title:  "division(/)",
+			in:     "1 + 2 * 3 - 40/2",
+			expect: []string{"1", "+", "2", "*", "3", "-", "40", "/", "2"},
+		},
 	}
 	for _, tt := range testcases {
 		t.Run(tt.title, func(t *testing.T) {
@@ -50,7 +60,7 @@ func TestTokenize(t *testing.T) {
 				t.Errorf("error should be nil but got %v", err)
 			}
 			if diff := cmp.Diff(got, tt.expect); diff != "" {
-				t.Errorf("differs: (-got +expect)\n%s", diff)
+				t.Errorf("differs: (-got +expect)\n%s\ninput: %s", diff, tt.in)
 			}
 		})
 	}
@@ -229,6 +239,60 @@ func TestCompileAST(t *testing.T) {
 				"main:",
 				"    push 2",
 				"    push 1",
+				"    pop rdi",
+				"    pop rax",
+				"    sub rax, rdi",
+				"    push rax",
+				"    pop rax",
+				"    ret",
+				"",
+			},
+		},
+		{
+			title: "2*3-4/2",
+			in: &ast.Node{
+				Kind: ast.Sub,
+				Lhs: &ast.Node{
+					Kind: ast.Mul,
+					Lhs: &ast.Node{
+						Kind:  ast.Num,
+						Value: 2,
+					},
+					Rhs: &ast.Node{
+						Kind:  ast.Num,
+						Value: 3,
+					},
+				},
+				Rhs: &ast.Node{
+					Kind: ast.Div,
+					Lhs: &ast.Node{
+						Kind:  ast.Num,
+						Value: 4,
+					},
+					Rhs: &ast.Node{
+						Kind:  ast.Num,
+						Value: 2,
+					},
+				},
+			},
+			expect: []string{
+				".intel_syntax noprefix",
+				".globl main",
+				"",
+				"main:",
+				"    push 2",
+				"    push 3",
+				"    pop rdi",
+				"    pop rax",
+				"    imul rax, rdi",
+				"    push rax",
+				"    push 4",
+				"    push 2",
+				"    pop rdi",
+				"    pop rax",
+				"    cqo",
+				"    idiv rdi",
+				"    push rax",
 				"    pop rdi",
 				"    pop rax",
 				"    sub rax, rdi",
