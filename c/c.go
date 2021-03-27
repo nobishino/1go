@@ -9,8 +9,8 @@ import (
 	"github.com/nobishino/1go/ast"
 )
 
-// Compile compiles source code and returns assembly code
-func Compile(src string) (string, error) {
+// NaiveAddSub compiles source code and returns assembly code
+func NaiveAddSub(src string) (string, error) {
 	buf := new(bytes.Buffer)
 	fmt.Fprintln(buf, ".intel_syntax noprefix")
 	fmt.Fprintln(buf, ".globl main")
@@ -33,6 +33,20 @@ func Compile(src string) (string, error) {
 	}
 	fmt.Fprintln(buf, "    ret")
 	return buf.String(), nil
+}
+
+// Compile compiles source code and returns asssembly w/ intel syntax
+func Compile(src string) (string, error) {
+	tokens, err := Tokenize(src)
+	if err != nil {
+		return "", err
+	}
+	parsed, err := ast.NewParser(tokens).Parse()
+	if err != nil {
+		return "", err
+	}
+	result := Gen(parsed)
+	return strings.Join(result, "\n"), nil
 }
 
 func Tokenize(src string) ([]string, error) {
@@ -88,7 +102,7 @@ func Validate(src string) error {
 	return nil
 }
 
-func CompileAST(node *ast.Node) []string {
+func Gen(node *ast.Node) []string {
 	if node == nil {
 		return nil
 	}
@@ -99,7 +113,10 @@ func CompileAST(node *ast.Node) []string {
 		"main:",
 	}
 	result = append(result, genAST(node)...)
-	result = append(result, "    ret")
+	result = append(result,
+		"    pop rax",
+		"    ret",
+		"")
 	return result
 }
 
@@ -132,12 +149,12 @@ var headers = []string{
 var add = []string{
 	"    pop rdi",
 	"    pop rax",
-	"    add rax rdx",
+	"    add rax, rdi",
 	"    push rax",
 }
 var sub = []string{
 	"    pop rdi",
 	"    pop rax",
-	"    sub rax rdx",
+	"    sub rax, rdi",
 	"    push rax",
 }

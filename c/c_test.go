@@ -143,7 +143,7 @@ func TestAddSub(t *testing.T) {
 		},
 	}
 	for _, tt := range testcases {
-		got, err := c.Compile(tt.in)
+		got, err := c.NaiveAddSub(tt.in)
 		if err != nil {
 			t.Errorf("error should be nil but got %v", err)
 		}
@@ -202,9 +202,11 @@ func TestCompileAST(t *testing.T) {
 				"    push 2",
 				"    pop rdi",
 				"    pop rax",
-				"    add rax rdx",
+				"    add rax, rdi",
 				"    push rax",
+				"    pop rax",
 				"    ret",
+				"",
 			},
 		},
 		{
@@ -229,15 +231,17 @@ func TestCompileAST(t *testing.T) {
 				"    push 1",
 				"    pop rdi",
 				"    pop rax",
-				"    sub rax rdx",
+				"    sub rax, rdi",
 				"    push rax",
+				"    pop rax",
 				"    ret",
+				"",
 			},
 		},
 	}
 	for _, tt := range testcases {
 		t.Run(tt.title, func(t *testing.T) {
-			got := c.CompileAST(tt.in)
+			got := c.Gen(tt.in)
 			if diff := cmp.Diff(got, tt.expect); diff != "" {
 				t.Errorf("differs: (-got +expect)\n%s", diff)
 			}

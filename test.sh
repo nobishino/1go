@@ -15,6 +15,7 @@ assert() {
     exit 1
   fi
 }
+go test ./...
 
 assert 0 0
 assert 42 42
