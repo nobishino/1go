@@ -21,20 +21,22 @@ func (p *Parser) expr() (*Node, error) {
 	if err != nil {
 		return nil, err
 	}
-	if p.consume("+") {
-		rhs, err := p.expr()
-		if err != nil {
-			return nil, err
+	for {
+		if p.consume("+") {
+			rhs, err := p.mul()
+			if err != nil {
+				return nil, err
+			}
+			node = NewNode(Add, node, rhs)
+		} else if p.consume("-") {
+			rhs, err := p.mul()
+			if err != nil {
+				return nil, err
+			}
+			node = NewNode(Sub, node, rhs)
+		} else {
+			return node, nil
 		}
-		return NewNode(Add, node, rhs), nil
-	} else if p.consume("-") {
-		rhs, err := p.expr()
-		if err != nil {
-			return nil, err
-		}
-		return NewNode(Sub, node, rhs), nil
-	} else {
-		return node, nil
 	}
 }
 
@@ -44,13 +46,13 @@ func (p *Parser) mul() (*Node, error) {
 		return nil, err
 	}
 	if p.consume("*") {
-		rhs, err := p.mul()
+		rhs, err := p.primary()
 		if err != nil {
 			return nil, err
 		}
 		return NewNode(Mul, node, rhs), nil
 	} else if p.consume("/") {
-		rhs, err := p.mul()
+		rhs, err := p.primary()
 		if err != nil {
 			return nil, err
 		}
@@ -61,10 +63,6 @@ func (p *Parser) mul() (*Node, error) {
 }
 
 func (p *Parser) primary() (*Node, error) {
-	node, err := p.expectNumber()
-	if err != nil {
-		return nil, err
-	}
 	if p.consume("(") {
 		exp, err := p.expr()
 		if err != nil {
@@ -76,6 +74,10 @@ func (p *Parser) primary() (*Node, error) {
 			return nil, xerrors.Errorf("parse failed at token #%v: %s", p.loc+1, p.current())
 		}
 	} else {
+		node, err := p.expectNumber()
+		if err != nil {
+			return nil, err
+		}
 		return node, nil
 	}
 }

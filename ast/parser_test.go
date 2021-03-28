@@ -55,21 +55,21 @@ func TestParser(t *testing.T) {
 			title:  "4 + 21 - 12",
 			tokens: []string{"4", "+", "21", "-", "12"},
 			expect: &ast.Node{
-				Kind: ast.Add,
+				Kind: ast.Sub,
 				Lhs: &ast.Node{
-					Kind:  ast.Num,
-					Value: 4,
-				},
-				Rhs: &ast.Node{
-					Kind: ast.Sub,
+					Kind: ast.Add,
 					Lhs: &ast.Node{
 						Kind:  ast.Num,
-						Value: 21,
+						Value: 4,
 					},
 					Rhs: &ast.Node{
 						Kind:  ast.Num,
-						Value: 12,
+						Value: 21,
 					},
+				},
+				Rhs: &ast.Node{
+					Kind:  ast.Num,
+					Value: 12,
 				},
 			},
 		},
@@ -113,6 +113,28 @@ func TestParser(t *testing.T) {
 					Rhs: &ast.Node{
 						Kind:  ast.Num,
 						Value: 3,
+					},
+				},
+			},
+		},
+		{
+			title:  "5 * (9 - 6)",
+			tokens: []string{"5", "*", "(", "9", "-", "6", ")"},
+			expect: &ast.Node{
+				Kind: ast.Mul,
+				Lhs: &ast.Node{
+					Kind:  ast.Num,
+					Value: 5,
+				},
+				Rhs: &ast.Node{
+					Kind: ast.Sub,
+					Lhs: &ast.Node{
+						Kind:  ast.Num,
+						Value: 9,
+					},
+					Rhs: &ast.Node{
+						Kind:  ast.Num,
+						Value: 6,
 					},
 				},
 			},
