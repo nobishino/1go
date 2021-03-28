@@ -139,6 +139,29 @@ func TestParser(t *testing.T) {
 				},
 			},
 		},
+		{
+			title:  "-1(unary)",
+			tokens: []string{"-", "1"},
+			expect: &ast.Node{
+				Kind: ast.Sub,
+				Lhs: &ast.Node{
+					Kind:  ast.Num,
+					Value: 0,
+				},
+				Rhs: &ast.Node{
+					Kind:  ast.Num,
+					Value: 1,
+				},
+			},
+		},
+		{
+			title:  "+1(unary)",
+			tokens: []string{"+", "1"},
+			expect: &ast.Node{
+				Kind:  ast.Num,
+				Value: 1,
+			},
+		},
 	}
 	for _, tt := range testcases {
 		t.Run(tt.title, func(t *testing.T) {

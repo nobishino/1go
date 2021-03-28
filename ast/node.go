@@ -26,3 +26,10 @@ func NewNode(k Kind, lhs, rhs *Node) *Node {
 		Rhs:  rhs,
 	}
 }
+
+func newNumber(value int) *Node {
+	return &Node{
+		Kind:  Num,
+		Value: value,
+	}
+}

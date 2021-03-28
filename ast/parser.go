@@ -41,24 +41,38 @@ func (p *Parser) expr() (*Node, error) {
 }
 
 func (p *Parser) mul() (*Node, error) {
-	node, err := p.primary()
+	node, err := p.unary()
 	if err != nil {
 		return nil, err
 	}
 	if p.consume("*") {
-		rhs, err := p.primary()
+		rhs, err := p.unary()
 		if err != nil {
 			return nil, err
 		}
 		return NewNode(Mul, node, rhs), nil
 	} else if p.consume("/") {
-		rhs, err := p.primary()
+		rhs, err := p.unary()
 		if err != nil {
 			return nil, err
 		}
 		return NewNode(Div, node, rhs), nil
 	} else {
 		return node, nil
+	}
+}
+
+func (p *Parser) unary() (*Node, error) {
+	if p.consume("+") {
+		return p.primary()
+	} else if p.consume("-") {
+		rhs, err := p.primary()
+		if err != nil {
+			return nil, err
+		}
+		return NewNode(Sub, newNumber(0), rhs), nil
+	} else {
+		return p.primary()
 	}
 }
 
