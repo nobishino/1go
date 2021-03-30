@@ -12,6 +12,19 @@ const (
 	TKEOF
 )
 
+func (tk TokenKind) String() string {
+	switch tk {
+	case TKReserved:
+		return "RESERVED"
+	case TKNum:
+		return "NUM"
+	case TKEOF:
+		return "EOF"
+	default:
+		return "UNDEFINED"
+	}
+}
+
 type Token struct {
 	kind TokenKind
 	next *Token
@@ -74,6 +87,11 @@ func tokenize(src string) (*Token, error) {
 		}
 
 	}
+	c, err := newToken(TKEOF, cur, "")
+	if err != nil {
+		return nil, err
+	}
+	cur = c
 	return head.next, nil
 }
 
