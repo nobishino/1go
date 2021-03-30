@@ -45,76 +45,62 @@ const (
 
 // one-char ops: +, -, *, /
 // nums 1, 2, 3, 10
-// func tokenize(src string) ([]string, error) {
-// 	var i int
-// 	rs := []rune(src)
-// 	read := func(r ...rune) bool {
-// 		if !(i+len(r) <= len(rs)) {
-// 			return false
-// 		}
-// 		for k, v := range r {
-// 			if rs[i+k] != v {
-// 				return false
-// 			}
-// 		}
-// 		i += len(r)
-// 		return true
-// 	}
-// // readDigit := func() bool {
-// // 	for k:=i;k < len(rs); k++ {
-// // 		if !isDigit(rs[k]) { return false}
-// // 	}
-// // 	return true
-// // }
+func tokenize(src string) (*Token, error) {
+	head := new(Token)
+	cur := head
+	rs := []rune(src)
+	for len(rs) > 0 {
+		if isSpace(rs[0]) {
+			rs = rs[1:]
+			continue
+		}
+		if rs[0] == '+' || rs[0] == '-' {
+			c, err := newToken(TKReserved, cur, string(rs[0]))
+			if err != nil {
+				return nil, err
+			}
+			cur = c
+			rs = rs[1:]
+			continue
+		}
 
-// 	head := new(Token)
-// 	cur := head
-// 	for i < len(rs) {
-// 		switch {
-// 		case read(' '):
-// 		case read('+'):
-// 			c,err := newToken(TKReserved, cur,"+")
-// 			if err != nil {
-// 				return nil,err
-// 			}
-// 			cur = c
-// 		case read('-'):
-// 			newToken(TKReserved, cur,"-")
-// 			c,err := newToken(TKReserved, cur,"+")
-// 			if err != nil {
-// 				return nil,err
-// 			}
-// 			cur = c
-// 		case read('*'):
-// 			newToken(TKReserved, cur,"*")
-// 			c,err := newToken(TKReserved, cur,"+")
-// 			if err != nil {
-// 				return nil,err
-// 			}
-// 			cur = c
-// 		case read('/'):
-// 			newToken(TKReserved, cur,"/")
-// 			c,err := newToken(TKReserved, cur,"+")
-// 			if err != nil {
-// 				return nil,err
-// 			}
-// 			cur = c
-// 		}
-// 	}
-// 	cur = newToken(TKEOF, cur, "")
-// }
+		if i := readDigit(rs); i > 0 {
+			c, err := newToken(TKNum, cur, string(rs[:i]))
+			if err != nil {
+				return nil, err
+			}
+			cur = c
+			rs = rs[i:]
+		}
 
-var digits = map[rune]struct{}{
-	'0': {},
-	'1': {},
-	'2': {},
-	'3': {},
-	'4': {},
-	'5': {},
-	'6': {},
-	'7': {},
-	'8': {},
-	'9': {},
+	}
+	return head.next, nil
+}
+
+func isSpace(r rune) bool {
+	return r == ' '
+}
+
+// 何桁目まで数値であるかを返す
+func readDigit(rs []rune) int {
+	var i int
+	for i < len(rs) && digits[rs[i]] {
+		i++
+	}
+	return i
+}
+
+var digits = map[rune]bool{
+	'0': true,
+	'1': true,
+	'2': true,
+	'3': true,
+	'4': true,
+	'5': true,
+	'6': true,
+	'7': true,
+	'8': true,
+	'9': true,
 }
 
 func isDigit(r rune) bool {
