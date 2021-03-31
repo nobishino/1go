@@ -33,13 +33,13 @@ func (p *TParser) Parse() (*Node, error) {
 }
 
 func (p *TParser) expr() (*Node, error) {
-	node, err := p.expectNumber()
+	node, err := p.mul()
 	if err != nil {
 		return nil, err
 	}
 	for p.token.kind != TKEOF {
 		if p.consume("+") {
-			rhs, err := p.expr()
+			rhs, err := p.mul()
 			if err != nil {
 				return nil, err
 			}
@@ -47,7 +47,7 @@ func (p *TParser) expr() (*Node, error) {
 			continue
 		}
 		if p.consume("-") {
-			rhs, err := p.expr()
+			rhs, err := p.mul()
 			if err != nil {
 				return nil, err
 			}
@@ -55,6 +55,39 @@ func (p *TParser) expr() (*Node, error) {
 			continue
 		}
 		return nil, xerrors.Errorf("unexpected token %+v (kind = %s)", *p.token, p.token.kind)
+	}
+	return node, nil
+}
+
+func (p *TParser) mul() (*Node, error) {
+	node, err := p.primary()
+	if err != nil {
+		return nil, err
+	}
+	if p.consume("*") {
+		rhs, err := p.primary()
+		if err != nil {
+			return nil, err
+		}
+		node = NewNode(Mul, node, rhs)
+	}
+	return node, nil
+}
+
+func (p *TParser) primary() (*Node, error) {
+	if p.consume("(") {
+		e, err := p.expr()
+		if err != nil {
+			return nil, err
+		}
+		if p.consume(")") {
+			return e, nil
+		}
+		return nil, xerrors.Errorf("token ')' is missing in (expr), got %q", p.token.str)
+	}
+	node, err := p.expectNumber()
+	if err != nil {
+		return nil, err
 	}
 	return node, nil
 }

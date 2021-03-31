@@ -38,19 +38,19 @@ func TestTParser(t *testing.T) {
 			expect: &ast.Node{
 				Kind: ast.Add,
 				Lhs: &ast.Node{
-					Value: 1,
-					Kind:  ast.Num,
-				},
-				Rhs: &ast.Node{
 					Kind: ast.Add,
 					Lhs: &ast.Node{
-						Value: 2,
+						Value: 1,
 						Kind:  ast.Num,
 					},
 					Rhs: &ast.Node{
-						Value: 3,
+						Value: 2,
 						Kind:  ast.Num,
 					},
+				},
+				Rhs: &ast.Node{
+					Value: 3,
+					Kind:  ast.Num,
 				},
 			},
 		},
@@ -65,6 +65,27 @@ func TestTParser(t *testing.T) {
 				Rhs: &ast.Node{
 					Kind:  ast.Num,
 					Value: 2,
+				},
+			},
+		},
+		{
+			in: "1 + 2*3",
+			expect: &ast.Node{
+				Kind: ast.Add,
+				Lhs: &ast.Node{
+					Kind:  ast.Num,
+					Value: 1,
+				},
+				Rhs: &ast.Node{
+					Kind: ast.Mul,
+					Lhs: &ast.Node{
+						Kind:  ast.Num,
+						Value: 2,
+					},
+					Rhs: &ast.Node{
+						Kind:  ast.Num,
+						Value: 3,
+					},
 				},
 			},
 		},
