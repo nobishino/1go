@@ -46,6 +46,14 @@ func (p *TParser) expr() (*Node, error) {
 			node = NewNode(Add, node, rhs)
 			continue
 		}
+		if p.consume("-") {
+			rhs, err := p.expr()
+			if err != nil {
+				return nil, err
+			}
+			node = NewNode(Sub, node, rhs)
+			continue
+		}
 		return nil, xerrors.Errorf("unexpected token %+v (kind = %s)", *p.token, p.token.kind)
 	}
 	return node, nil
