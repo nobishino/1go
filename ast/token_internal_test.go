@@ -26,10 +26,7 @@ func TestNewToken(t *testing.T) {
 	for _, tt := range testcases {
 		t.Run(tt.title, func(t *testing.T) {
 			token := Token{}
-			got, err := newToken(tt.kind, &token, tt.str)
-			if err != nil {
-				t.Errorf("expect error to be nil, but got %v", err)
-			}
+			got := newToken(tt.kind, &token, tt.str)
 			if diff := cmp.Diff(got, tt.expect, cmp.AllowUnexported(Token{})); diff != "" {
 				t.Errorf("[%s] differs: (-got +expect)\n%s", tt.title, diff)
 			}

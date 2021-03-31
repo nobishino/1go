@@ -35,20 +35,30 @@ type Token struct {
 // var token *Token // 現在着目しているトークン. 連結リスト構造を持つ
 
 // 新しいTokenを作成してtokenにつなげる
-func newToken(kind TokenKind, cur *Token, str string) (*Token, error) {
+func newNumToken(cur *Token, str string) (*Token, error) {
+	new := &Token{
+		kind: TKNum,
+		str:  str,
+	}
+	val, err := strconv.Atoi(str)
+	if err != nil {
+		return nil, err
+	}
+	new.val = val
+	cur.next = new
+	return new, nil
+}
+
+func newToken(kind TokenKind, cur *Token, str string) *Token {
+	if kind == TKNum { // Num tokenは扱えないので何もしない
+		return cur
+	}
 	new := &Token{
 		kind: kind,
 		str:  str,
 	}
-	if kind == TKNum {
-		val, err := strconv.Atoi(str)
-		if err != nil {
-			return nil, err
-		}
-		new.val = val
-	}
 	cur.next = new
-	return new, nil
+	return new
 }
 
 const (
@@ -68,17 +78,13 @@ func tokenize(src string) (*Token, error) {
 			continue
 		}
 		if rs[0] == '+' || rs[0] == '-' {
-			c, err := newToken(TKReserved, cur, string(rs[0]))
-			if err != nil {
-				return nil, err
-			}
-			cur = c
+			cur = newToken(TKReserved, cur, string(rs[0]))
 			rs = rs[1:]
 			continue
 		}
 
 		if i := readDigit(rs); i > 0 {
-			c, err := newToken(TKNum, cur, string(rs[:i]))
+			c, err := newNumToken(cur, string(rs[:i]))
 			if err != nil {
 				return nil, err
 			}
@@ -87,11 +93,7 @@ func tokenize(src string) (*Token, error) {
 		}
 
 	}
-	c, err := newToken(TKEOF, cur, "")
-	if err != nil {
-		return nil, err
-	}
-	cur = c
+	cur = newToken(TKEOF, cur, "")
 	return head.next, nil
 }
 
