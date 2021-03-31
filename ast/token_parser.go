@@ -71,6 +71,13 @@ func (p *TParser) mul() (*Node, error) {
 		}
 		node = NewNode(Mul, node, rhs)
 	}
+	if p.consume("/") {
+		rhs, err := p.primary()
+		if err != nil {
+			return nil, err
+		}
+		node = NewNode(Div, node, rhs)
+	}
 	return node, nil
 }
 
