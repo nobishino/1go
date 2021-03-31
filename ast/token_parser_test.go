@@ -33,6 +33,27 @@ func TestTParser(t *testing.T) {
 				},
 			},
 		},
+		{
+			in: "1+2+3",
+			expect: &ast.Node{
+				Kind: ast.Add,
+				Lhs: &ast.Node{
+					Value: 1,
+					Kind:  ast.Num,
+				},
+				Rhs: &ast.Node{
+					Kind: ast.Add,
+					Lhs: &ast.Node{
+						Value: 2,
+						Kind:  ast.Num,
+					},
+					Rhs: &ast.Node{
+						Value: 3,
+						Kind:  ast.Num,
+					},
+				},
+			},
+		},
 	}
 	for _, tt := range testcases {
 		t.Run(tt.in, func(t *testing.T) {
