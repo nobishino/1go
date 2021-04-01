@@ -1,6 +1,8 @@
 package ast
 
-import "golang.org/x/xerrors"
+import (
+	"golang.org/x/xerrors"
+)
 
 type TParser struct {
 	token *Token
@@ -54,7 +56,7 @@ func (p *TParser) expr() (*Node, error) {
 			node = NewNode(Sub, node, rhs)
 			continue
 		}
-		return nil, xerrors.Errorf("unexpected token %+v (kind = %s)", *p.token, p.token.kind)
+		break
 	}
 	return node, nil
 }

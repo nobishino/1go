@@ -77,7 +77,7 @@ func tokenize(src string) (*Token, error) {
 			rs = rs[1:]
 			continue
 		}
-		if rs[0] == '+' || rs[0] == '-' || rs[0] == '*' || rs[0] == '/' {
+		if rs[0] == '+' || rs[0] == '-' || rs[0] == '*' || rs[0] == '/' || rs[0] == '(' || rs[0] == ')' {
 			cur = newToken(TKReserved, cur, string(rs[0]))
 			rs = rs[1:]
 			continue

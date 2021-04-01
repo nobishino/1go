@@ -110,12 +110,55 @@ func TestTParser(t *testing.T) {
 				},
 			},
 		},
+		{
+			in: "5-4/2",
+			expect: &ast.Node{
+				Kind: ast.Sub,
+				Lhs: &ast.Node{
+					Kind:  ast.Num,
+					Value: 5,
+				},
+				Rhs: &ast.Node{
+					Kind: ast.Div,
+					Lhs: &ast.Node{
+						Kind:  ast.Num,
+						Value: 4,
+					},
+					Rhs: &ast.Node{
+						Kind:  ast.Num,
+						Value: 2,
+					},
+				},
+			},
+		},
+		{
+			in: "3*(1+2)",
+			expect: &ast.Node{
+				Kind: ast.Mul,
+				Lhs: &ast.Node{
+					Kind:  ast.Num,
+					Value: 3,
+				},
+				Rhs: &ast.Node{
+					Kind: ast.Add,
+					Lhs: &ast.Node{
+						Kind:  ast.Num,
+						Value: 1,
+					},
+					Rhs: &ast.Node{
+						Kind:  ast.Num,
+						Value: 2,
+					},
+				},
+			},
+		},
 	}
 	for _, tt := range testcases {
 		t.Run(tt.in, func(t *testing.T) {
 			p, err := ast.NewTParser(tt.in)
 			if err != nil {
-				t.Errorf("expect error to be nil but got %v while creating parser", err)
+				// fmt.Printf("%+v", err)
+				t.Errorf("expect error to be nil but got %+v while creating parser", err)
 			}
 			got, err := p.Parse()
 			if err != nil {
