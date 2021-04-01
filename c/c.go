@@ -139,6 +139,8 @@ func genAST(node *ast.Node) []string {
 		result = append(result, div...)
 	case ast.Eq:
 		result = append(result, eq...)
+	case ast.Neq:
+		result = append(result, neq...)
 	case ast.Num:
 		result = append(result, fmt.Sprintf("    push %d", node.Value))
 	}
@@ -185,6 +187,15 @@ var eq = []string{
 	"    pop rax",
 	"    cmp rax, rdi",
 	"    sete al",
+	"    movzb rax, al",
+	"    push rax",
+}
+
+var neq = []string{
+	"    pop rdi",
+	"    pop rax",
+	"    cmp rax, rdi",
+	"    setne al",
 	"    movzb rax, al",
 	"    push rax",
 }
