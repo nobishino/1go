@@ -68,6 +68,20 @@ const (
 	minus rune = '-'
 )
 
+var reserved = map[int]map[string]bool{
+	1: {
+		"+": true,
+		"-": true,
+		"*": true,
+		"/": true,
+		"(": true,
+		")": true,
+	},
+	2: {
+		"==": true,
+	},
+}
+
 // one-char ops: +, -, *, /
 // nums 1, 2, 3, 10
 func tokenize(src string) (*Token, error) {
@@ -79,17 +93,18 @@ func tokenize(src string) (*Token, error) {
 			rs = rs[1:]
 			continue
 		}
-		if len(rs) > 1 {
-			head := string(rs[:2])
-			if head == "==" {
-				cur = newToken(TKReserved, cur, head)
-				rs = rs[2:]
-				continue
+		head := func() string {
+			if len(rs) > 1 && reserved[2][string(rs[:2])] {
+				return string(rs[:2])
 			}
-		}
-		if rs[0] == '+' || rs[0] == '-' || rs[0] == '*' || rs[0] == '/' || rs[0] == '(' || rs[0] == ')' {
-			cur = newToken(TKReserved, cur, string(rs[0]))
-			rs = rs[1:]
+			if reserved[1][string(rs[:1])] {
+				return string(rs[:1])
+			}
+			return ""
+		}()
+		if len(head) > 0 { // 何らかの予約語トークンにマッチした場合
+			cur = newToken(TKReserved, cur, head)
+			rs = rs[len(head):]
 			continue
 		}
 
