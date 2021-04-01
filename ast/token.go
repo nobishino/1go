@@ -79,6 +79,7 @@ var reserved = map[int]map[string]bool{
 	},
 	2: {
 		"==": true,
+		"!=": true,
 	},
 }
 

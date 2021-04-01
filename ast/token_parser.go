@@ -56,6 +56,13 @@ func (p *TParser) equality() (*Node, error) {
 			node = NewNode(Eq, node, rhs)
 			continue
 		}
+		if p.consume("!=") {
+			rhs, err := p.add()
+			if err != nil {
+				return nil, xerrors.Errorf("failed to parse right-hand side of !=, because of %w", err)
+			}
+			node = NewNode(Neq, node, rhs)
+		}
 		break
 	}
 	return node, nil

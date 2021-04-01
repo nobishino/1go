@@ -187,6 +187,20 @@ func TestTParser(t *testing.T) {
 				},
 			},
 		},
+		{
+			in: "1!=2",
+			expect: &ast.Node{
+				Kind: ast.Neq,
+				Lhs: &ast.Node{
+					Kind:  ast.Num,
+					Value: 1,
+				},
+				Rhs: &ast.Node{
+					Kind:  ast.Num,
+					Value: 2,
+				},
+			},
+		},
 	}
 	for _, tt := range testcases {
 		t.Run(tt.in, func(t *testing.T) {
