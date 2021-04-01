@@ -35,6 +35,14 @@ func (p *TParser) Parse() (*Node, error) {
 }
 
 func (p *TParser) expr() (*Node, error) {
+	node, err := p.add()
+	if err != nil {
+		return nil, xerrors.Errorf("failed to parse expr %w", err)
+	}
+	return node, nil
+}
+
+func (p *TParser) add() (*Node, error) {
 	node, err := p.mul()
 	if err != nil {
 		return nil, err
@@ -60,6 +68,10 @@ func (p *TParser) expr() (*Node, error) {
 	}
 	return node, nil
 }
+
+// func (p *TParser) equality() (*Node,  error) {
+
+// }
 
 func (p *TParser) mul() (*Node, error) {
 	node, err := p.unary()
@@ -111,7 +123,7 @@ func (p *TParser) unary() (*Node, error) {
 
 func (p *TParser) primary() (*Node, error) {
 	if p.consume("(") {
-		e, err := p.expr()
+		e, err := p.add()
 		if err != nil {
 			return nil, err
 		}
