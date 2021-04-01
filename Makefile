@@ -4,7 +4,7 @@ CFLAGS=-std=c11 -g -static
 	go build main.go
 
 test: 1go
-	rm *.s
+	rm *.s -f
 	./test.sh
 
 clean:
