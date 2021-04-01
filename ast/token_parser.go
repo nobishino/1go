@@ -62,7 +62,7 @@ func (p *TParser) expr() (*Node, error) {
 }
 
 func (p *TParser) mul() (*Node, error) {
-	node, err := p.primary()
+	node, err := p.unary()
 	if err != nil {
 		return nil, err
 	}
@@ -79,6 +79,32 @@ func (p *TParser) mul() (*Node, error) {
 			return nil, err
 		}
 		node = NewNode(Div, node, rhs)
+	}
+	return node, nil
+}
+
+func (p *TParser) unary() (*Node, error) {
+	if p.consume("+") {
+		node, err := p.primary()
+		if err != nil {
+			xerrors.Errorf("failed to parse unary: %w", err)
+		}
+		return node, nil
+	}
+	if p.consume("-") {
+		node, err := p.primary()
+		if err != nil {
+			xerrors.Errorf("failed to parse unary: %w", err)
+		}
+		zero := &Node{
+			Kind:  Num,
+			Value: 0,
+		}
+		return NewNode(Sub, zero, node), nil
+	}
+	node, err := p.primary()
+	if err != nil {
+		xerrors.Errorf("failed to parse unary: %w", err)
 	}
 	return node, nil
 }

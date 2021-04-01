@@ -37,11 +37,11 @@ func NaiveAddSub(src string) (string, error) {
 
 // Compile compiles source code and returns asssembly w/ intel syntax
 func Compile(src string) (string, error) {
-	tokens, err := Tokenize(src)
+	p, err := ast.NewTParser(src)
 	if err != nil {
 		return "", err
 	}
-	parsed, err := ast.NewParser(tokens).Parse()
+	parsed, err := p.Parse()
 	if err != nil {
 		return "", err
 	}
