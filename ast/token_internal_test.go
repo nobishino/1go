@@ -20,6 +20,7 @@ func TestNewToken(t *testing.T) {
 			expect: &Token{
 				kind: TKReserved,
 				str:  "+",
+				len:  1,
 			},
 		},
 	}
@@ -52,6 +53,7 @@ func TestTokenizeToLinkedList(t *testing.T) {
 				next: &Token{
 					kind: TKReserved,
 					str:  "+",
+					len:  1,
 					next: &Token{
 						kind: TKNum,
 						str:  "1",
@@ -72,6 +74,7 @@ func TestTokenizeToLinkedList(t *testing.T) {
 				next: &Token{
 					kind: TKReserved,
 					str:  "+",
+					len:  1,
 					next: &Token{
 						kind: TKNum,
 						str:  "1",
@@ -81,6 +84,26 @@ func TestTokenizeToLinkedList(t *testing.T) {
 				},
 			},
 		},
+		// {
+		// 	title: "1==1",
+		// 	kind:  TKReserved,
+		// 	str:   "1==1",
+		// 	expect: &Token{
+		// 		kind: TKNum,
+		// 		str:  "1",
+		// 		val:  1,
+		// 		next: &Token{
+		// 			kind: TKReserved,
+		// 			str:  "==",
+		// 			next: &Token{
+		// 				kind: TKNum,
+		// 				str:  "1",
+		// 				val:  1,
+		// 				next: &Token{kind: TKEOF},
+		// 			},
+		// 		},
+		// 	},
+		// },
 	}
 	for _, tt := range testcases {
 		t.Run(tt.title, func(t *testing.T) {
