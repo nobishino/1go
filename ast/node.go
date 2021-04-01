@@ -17,6 +17,7 @@ const (
 	Sub Kind = "Sub"
 	Mul Kind = "Mul"
 	Div Kind = "Div"
+	Eq  Kind = "Equality"
 )
 
 func NewNode(k Kind, lhs, rhs *Node) *Node {

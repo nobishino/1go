@@ -35,9 +35,28 @@ func (p *TParser) Parse() (*Node, error) {
 }
 
 func (p *TParser) expr() (*Node, error) {
-	node, err := p.add()
+	node, err := p.equality()
 	if err != nil {
 		return nil, xerrors.Errorf("failed to parse expr %w", err)
+	}
+	return node, nil
+}
+
+func (p *TParser) equality() (*Node, error) {
+	node, err := p.add()
+	if err != nil {
+		return nil, xerrors.Errorf("failed to parse equality, because of %w", err)
+	}
+	for p.token.kind != TKEOF {
+		if p.consume("==") {
+			rhs, err := p.add()
+			if err != nil {
+				return nil, xerrors.Errorf("failed to parse right-hand side of ==, because of %w", err)
+			}
+			node = NewNode(Eq, node, rhs)
+			continue
+		}
+		break
 	}
 	return node, nil
 }
