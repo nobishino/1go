@@ -30,7 +30,7 @@ type Token struct {
 	next *Token
 	val  int    // TKNumの場合の値
 	str  string // トークン文字列
-	len  int
+	len  int    // トークン文字列の長さ。TKReservedの場合のみ >0
 }
 
 // var token *Token // 現在着目しているトークン. 連結リスト構造を持つ
@@ -79,13 +79,14 @@ func tokenize(src string) (*Token, error) {
 			rs = rs[1:]
 			continue
 		}
-		// if len(rs) > 1 {
-		// 	head := string(rs[:2])
-		// 	if head == "==" {
-		// 		cur = newToken(TKReserved, cur, head)
-		// 	}
-		// 	continue
-		// }
+		if len(rs) > 1 {
+			head := string(rs[:2])
+			if head == "==" {
+				cur = newToken(TKReserved, cur, head)
+				rs = rs[2:]
+				continue
+			}
+		}
 		if rs[0] == '+' || rs[0] == '-' || rs[0] == '*' || rs[0] == '/' || rs[0] == '(' || rs[0] == ')' {
 			cur = newToken(TKReserved, cur, string(rs[0]))
 			rs = rs[1:]
