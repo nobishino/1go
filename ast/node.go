@@ -19,6 +19,10 @@ const (
 	Div Kind = "Div"
 	Eq  Kind = "Equality"
 	Neq Kind = "NonEquality"
+	LT  Kind = "LessThan"
+	GT  Kind = "GreaterThan"
+	LE  Kind = "LessThanOrEqual"
+	GE  Kind = "GreaterThanOrEqual"
 )
 
 func NewNode(k Kind, lhs, rhs *Node) *Node {

@@ -43,13 +43,13 @@ func (p *TParser) expr() (*Node, error) {
 }
 
 func (p *TParser) equality() (*Node, error) {
-	node, err := p.add()
+	node, err := p.relational()
 	if err != nil {
 		return nil, xerrors.Errorf("failed to parse equality, because of %w", err)
 	}
 	for p.token.kind != TKEOF {
 		if p.consume("==") {
-			rhs, err := p.add()
+			rhs, err := p.relational()
 			if err != nil {
 				return nil, xerrors.Errorf("failed to parse right-hand side of ==, because of %w", err)
 			}
@@ -57,11 +57,50 @@ func (p *TParser) equality() (*Node, error) {
 			continue
 		}
 		if p.consume("!=") {
-			rhs, err := p.add()
+			rhs, err := p.relational()
 			if err != nil {
 				return nil, xerrors.Errorf("failed to parse right-hand side of !=, because of %w", err)
 			}
 			node = NewNode(Neq, node, rhs)
+		}
+		break
+	}
+	return node, nil
+}
+
+func (p *TParser) relational() (*Node, error) {
+	node, err := p.add()
+	if err != nil {
+		return nil, xerrors.Errorf("failed to parse leftmost part of relational. cause: %w", err)
+	}
+	for p.token.kind != TKEOF {
+		if p.consume("<") {
+			rhs, err := p.add()
+			if err != nil {
+				return nil, xerrors.Errorf("failed to parse right hand side of <. cause: %w", err)
+			}
+			node = NewNode(LT, node, rhs)
+		}
+		if p.consume("<=") {
+			rhs, err := p.add()
+			if err != nil {
+				return nil, xerrors.Errorf("failed to parse right hand side of <=. cause: %w", err)
+			}
+			node = NewNode(LE, node, rhs)
+		}
+		if p.consume(">") {
+			rhs, err := p.add()
+			if err != nil {
+				return nil, xerrors.Errorf("failed to parse right hand side of <. cause: %w", err)
+			}
+			node = NewNode(LT, rhs, node) // 逆向きの < としてparseする
+		}
+		if p.consume(">=") {
+			rhs, err := p.add()
+			if err != nil {
+				return nil, xerrors.Errorf("failed to parse right hand side of >=. cause: %w", err)
+			}
+			node = NewNode(LE, rhs, node) // 逆向きの <= としてparseする
 		}
 		break
 	}
