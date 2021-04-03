@@ -276,7 +276,7 @@ func TestTParser(t *testing.T) {
 			expect: &ast.Node{
 				Kind: ast.Assign,
 				Lhs: &ast.Node{
-					Kind: ast.Ident,
+					Kind: ast.LocalVar,
 					Name: "a",
 				},
 				Rhs: &ast.Node{

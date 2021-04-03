@@ -237,7 +237,7 @@ func (p *TParser) parseIfIdentifier() (*Node, bool) {
 	name := p.token.str
 	p.token = p.token.next
 	return &Node{
-		Kind: Ident,
+		Kind: LocalVar,
 		Name: name,
 	}, true
 }
@@ -255,7 +255,7 @@ func (p *TParser) ident() (*Node, error) {
 		return nil, xerrors.Errorf("expect identifier token but got %+v", *p.token)
 	}
 	node := &Node{
-		Kind: Ident,
+		Kind: LocalVar,
 		Name: p.token.str,
 	}
 	p.token = p.token.next
