@@ -1,11 +1,14 @@
 package ast
 
 import (
+	"fmt"
+
 	"golang.org/x/xerrors"
 )
 
 type TParser struct {
 	token *Token
+	pos   int
 }
 
 func NewTParser(src string) (*TParser, error) {
@@ -23,6 +26,7 @@ func (p *TParser) consume(s string) bool {
 		return false
 	}
 	p.token = p.token.next
+	p.pos++
 	return true
 }
 
@@ -35,11 +39,30 @@ func (p *TParser) Parse() (*Node, error) {
 }
 
 func (p *TParser) expr() (*Node, error) {
-	node, err := p.equality()
+	node, err := p.assign()
 	if err != nil {
 		return nil, xerrors.Errorf("failed to parse expr %w", err)
 	}
 	return node, nil
+}
+
+func (p *TParser) assign() (*Node, error) {
+	node, err := p.equality()
+	if err != nil {
+		return nil, xerrors.Errorf("failed to parse left hand side of =. caused by %w", err)
+	}
+	if p.token.kind != TKEOF && p.consume("=") {
+		rhs, err := p.assign()
+		if err != nil {
+			return nil, xerrors.Errorf("failed to parse right hand side of =. caused by %w", err)
+		}
+		node = NewNode(Assign, node, rhs)
+	}
+	return node, nil
+}
+
+func (p *TParser) debug() {
+	fmt.Printf("DEBUG: current pos = %v, kind = %q, label = %q\n", p.pos, p.token.kind, p.token.str)
 }
 
 func (p *TParser) equality() (*Node, error) {
@@ -197,10 +220,46 @@ func (p *TParser) primary() (*Node, error) {
 		}
 		return nil, xerrors.Errorf("token ')' is missing in (expr), got %q", p.token.str)
 	}
+	if node, ok := p.parseIfIdentifier(); ok {
+		return node, nil
+	}
 	node, err := p.expectNumber()
 	if err != nil {
 		return nil, err
 	}
+	return node, nil
+}
+
+func (p *TParser) parseIfIdentifier() (*Node, bool) {
+	if p.token.kind != TKIDENT {
+		return nil, false
+	}
+	name := p.token.str
+	p.token = p.token.next
+	return &Node{
+		Kind: Ident,
+		Name: name,
+	}, true
+}
+
+// func (p *TParser) consumeNumberToken() (int, bool) {
+// 	if p.token.kind != TKNum {
+// 		return 0, false
+// 	}
+// }
+
+// これだと使いづらい
+// tokenを直接触らないようにする
+func (p *TParser) ident() (*Node, error) {
+	if p.token.kind != TKIDENT {
+		return nil, xerrors.Errorf("expect identifier token but got %+v", *p.token)
+	}
+	node := &Node{
+		Kind: Ident,
+		Name: p.token.str,
+	}
+	p.token = p.token.next
+	p.pos++
 	return node, nil
 }
 
@@ -213,5 +272,6 @@ func (p *TParser) expectNumber() (*Node, error) {
 		Value: p.token.val,
 	}
 	p.token = p.token.next
+	p.pos++
 	return node, nil
 }

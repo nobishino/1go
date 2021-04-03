@@ -10,6 +10,7 @@ const (
 	TKReserved TokenKind = iota
 	TKNum
 	TKEOF
+	TKIDENT
 )
 
 func (tk TokenKind) String() string {
@@ -78,6 +79,7 @@ var reserved = map[int]map[string]bool{
 		")": true,
 		"<": true,
 		">": true,
+		"=": true,
 	},
 	2: {
 		"==": true,
@@ -98,7 +100,7 @@ func tokenize(src string) (*Token, error) {
 			rs = rs[1:]
 			continue
 		}
-		head := func() string {
+		reservedWord := func() string {
 			if len(rs) > 1 && reserved[2][string(rs[:2])] {
 				return string(rs[:2])
 			}
@@ -107,10 +109,13 @@ func tokenize(src string) (*Token, error) {
 			}
 			return ""
 		}()
-		if len(head) > 0 { // 何らかの予約語トークンにマッチした場合
-			cur = newToken(TKReserved, cur, head)
-			rs = rs[len(head):]
+		if len(reservedWord) > 0 { // 何らかの予約語トークンにマッチした場合
+			cur = newToken(TKReserved, cur, reservedWord)
+			rs = rs[len(reservedWord):]
 			continue
+		}
+		if len(rs) > 0 && 'a' <= rs[0] && rs[0] <= 'z' {
+			cur = newToken(TKIDENT, cur, string(rs[:1]))
 		}
 
 		if i := readDigit(rs); i > 0 {
