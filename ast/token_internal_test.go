@@ -38,14 +38,12 @@ func TestNewToken(t *testing.T) {
 func TestTokenizeToLinkedList(t *testing.T) {
 	testcases := [...]struct {
 		title  string
-		kind   TokenKind
-		str    string
+		source string
 		expect *Token
 	}{
 		{
-			title: "1+1(with space)",
-			kind:  TKReserved,
-			str:   " 1 + 1 ",
+			title:  "1+1(with space)",
+			source: " 1 + 1 ",
 			expect: &Token{
 				kind: TKNum,
 				str:  "1",
@@ -64,9 +62,8 @@ func TestTokenizeToLinkedList(t *testing.T) {
 			},
 		},
 		{
-			title: "1+1",
-			kind:  TKReserved,
-			str:   "1+1",
+			title:  "1+1",
+			source: "1+1",
 			expect: &Token{
 				kind: TKNum,
 				str:  "1",
@@ -85,9 +82,8 @@ func TestTokenizeToLinkedList(t *testing.T) {
 			},
 		},
 		{
-			title: "1==1",
-			kind:  TKReserved,
-			str:   "1==1",
+			title:  "1==1",
+			source: "1==1",
 			expect: &Token{
 				kind: TKNum,
 				str:  "1",
@@ -108,7 +104,7 @@ func TestTokenizeToLinkedList(t *testing.T) {
 	}
 	for _, tt := range testcases {
 		t.Run(tt.title, func(t *testing.T) {
-			got, err := tokenize(tt.str)
+			got, err := tokenize(tt.source)
 			if err != nil {
 				t.Errorf("expect error to be nil, but got %v", err)
 			}
