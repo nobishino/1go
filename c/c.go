@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/nobishino/1go/ast"
+	"golang.org/x/xerrors"
 )
 
 // NaiveAddSub compiles source code and returns assembly code
@@ -112,11 +113,13 @@ func Gen(node *ast.Node) []string {
 		"",
 		"main:",
 	}
+	result = append(result, prologue...)
 	result = append(result, genAST(node)...)
 	result = append(result,
 		"    pop rax",
-		"    ret",
-		"")
+	)
+	result = append(result, epilogue...)
+	result = append(result, "")
 	return result
 }
 
@@ -147,8 +150,28 @@ func genAST(node *ast.Node) []string {
 		result = append(result, le...)
 	case ast.Num:
 		result = append(result, fmt.Sprintf("    push %d", node.Value))
+	case ast.Assign:
+		pushMemAddr, err := genLeftValue(node.Lhs)
+		if err != nil {
+			panic(err) // TODO: 適切なエラー処理を行う
+		}
+		result = append(result, pushMemAddr...)
+		result = append(result, genAST(node.Rhs)...)  // 右辺のノードを評価する
+		result = append(result, assignRightToLeft...) // 代入命令を生成する
 	}
 	return result
+}
+
+// ローカル変数値(左辺値)のメモリアドレスをスタックにプッシュする命令を生成する
+func genLeftValue(node *ast.Node) ([]string, error) {
+	if node.Kind != ast.LocalVar {
+		return nil, xerrors.Errorf("expect left value but got node of kind %q", node.Kind)
+	}
+	return []string{
+		"    mov rax rbp",                          // ベースポインタの値をraxにコピーする
+		fmt.Sprintf("    sub rax %d", node.Offset), // ベースポインタの値から変数名で決まるオフセットを引く
+		"    push rax",
+	}, nil
 }
 
 var headers = []string{
@@ -220,4 +243,23 @@ var le = []string{
 	"    setle al",
 	"    movzb rax, al",
 	"    push rax",
+}
+
+var assignRightToLeft = []string{
+	"    pop rdi",        // 右辺値(評価結果)
+	"    pop rax",        // 左辺値のメモリアドレス
+	"    mov [rax], rdi", // ローカル変数のメモリ位置に右辺値をコピーする
+	"    push rdi",       // 代入された値は代入式自体の値になるのでスタックにpushする
+}
+
+var prologue = []string{
+	"    push rbp",     // 関数呼び出し前(callerの関数の実行時の)RBPレジスタの値をスタックに保存する
+	"    mov rbp, rsp", // この関数の実行中に基準点とするメモリアドレスをRBPレジスタにセットする
+	"    sub rsp, 208", // 8 x 26 bit をこの関数呼び出しインスタンスのローカル変数領域としてスタック領域に確保する
+}
+
+var epilogue = []string{
+	"    mov rsp, rbp", // ベースポインタの位置までRSPを戻してくる。これによりローカル変数領域が「捨てられる」
+	"    pop rbp",      // 1つ上の関数に対するベースの値をRBPに書き戻す。このpop命令の後、RSPはこの関数のリターンアドレスが書き込まれたメモリアドレスを指している
+	"    ret",          // Stackからpopし、そのpopした値のメモリアドレスに移動する。
 }
