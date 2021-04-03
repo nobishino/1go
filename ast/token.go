@@ -19,6 +19,8 @@ func (tk TokenKind) String() string {
 		return "RESERVED"
 	case TKNum:
 		return "NUM"
+	case TKIDENT:
+		return "IDENTIFIER"
 	case TKEOF:
 		return "EOF"
 	default:
@@ -114,8 +116,10 @@ func tokenize(src string) (*Token, error) {
 			rs = rs[len(reservedWord):]
 			continue
 		}
-		if len(rs) > 0 && 'a' <= rs[0] && rs[0] <= 'z' {
+		if len(rs) > 0 && 'a' <= rs[0] && rs[0] <= 'z' { // 1文字変数にマッチする場合
 			cur = newToken(TKIDENT, cur, string(rs[:1]))
+			rs = rs[1:]
+			continue
 		}
 
 		if i := readDigit(rs); i > 0 {
