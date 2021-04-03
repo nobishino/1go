@@ -235,32 +235,16 @@ func (p *TParser) parseIfIdentifier() (*Node, bool) {
 		return nil, false
 	}
 	name := p.token.str
+	if len(name) == 0 {
+		return nil, false
+	}
+	char := rune(name[0])
 	p.token = p.token.next
 	return &Node{
-		Kind: LocalVar,
-		Name: name,
+		Kind:   LocalVar,
+		Name:   name,
+		Offset: 8 * int(char-'a'+1),
 	}, true
-}
-
-// func (p *TParser) consumeNumberToken() (int, bool) {
-// 	if p.token.kind != TKNum {
-// 		return 0, false
-// 	}
-// }
-
-// これだと使いづらい
-// tokenを直接触らないようにする
-func (p *TParser) ident() (*Node, error) {
-	if p.token.kind != TKIDENT {
-		return nil, xerrors.Errorf("expect identifier token but got %+v", *p.token)
-	}
-	node := &Node{
-		Kind: LocalVar,
-		Name: p.token.str,
-	}
-	p.token = p.token.next
-	p.pos++
-	return node, nil
 }
 
 func (p *TParser) expectNumber() (*Node, error) {
