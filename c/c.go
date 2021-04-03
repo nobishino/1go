@@ -168,8 +168,8 @@ func genLeftValue(node *ast.Node) ([]string, error) {
 		return nil, xerrors.Errorf("expect left value but got node of kind %q", node.Kind)
 	}
 	return []string{
-		"    mov rax rbp",                          // ベースポインタの値をraxにコピーする
-		fmt.Sprintf("    sub rax %d", node.Offset), // ベースポインタの値から変数名で決まるオフセットを引く
+		"    mov rax, rbp",                          // ベースポインタの値をraxにコピーする
+		fmt.Sprintf("    sub rax, %d", node.Offset), // ベースポインタの値から変数名で決まるオフセットを引く
 		"    push rax",
 	}, nil
 }
