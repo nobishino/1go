@@ -3,10 +3,12 @@ package ast
 // Node represents AST node
 type Node struct {
 	Value int    // only used when Kind = Num
-	Name  string // only used when Kind = Ident
+	Name  string // only used when Kind = LocalVar
+	// TODO: delete Name field (全ての変数のoffsetはあらかじめ決めておくので名前は必要ないけどデバッグ用に残しておく)
 	Kind
-	Lhs *Node
-	Rhs *Node
+	Lhs    *Node
+	Rhs    *Node
+	Offset int // only used when Kind = LocalVar
 }
 
 // Kind represents kind of a node
