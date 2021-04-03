@@ -1,4 +1,8 @@
+[![test](https://github.com/nobishino/1go/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/nobishino/1go/actions/workflows/test.yml)
+
 # 1go
+
+Learn you go compiler for great good!
 
 ## コマンドメモ
 
