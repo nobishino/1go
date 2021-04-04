@@ -113,8 +113,8 @@ func Gen(nodes []*ast.Node) []string {
 		"",
 		"main:",
 	}
+	result = append(result, prologue...)
 	for _, node := range nodes {
-		result = append(result, prologue...)
 		result = append(result, genAST(node)...)
 		result = append(result,
 			"    pop rax",

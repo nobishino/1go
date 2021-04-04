@@ -280,6 +280,36 @@ func TestCompileAST(t *testing.T) {
 				"",
 			},
 		},
+		{
+			title: "2 statements",
+			in: []*ast.Node{
+				{
+					Kind:  ast.Num,
+					Value: 1,
+				},
+				{
+					Kind:  ast.Num,
+					Value: 2,
+				},
+			},
+			expect: []string{
+				".intel_syntax noprefix",
+				".globl main",
+				"",
+				"main:",
+				"    push rbp",
+				"    mov rbp, rsp",
+				"    sub rsp, 208",
+				"    push 1",
+				"    pop rax",
+				"    push 2",
+				"    pop rax",
+				"    mov rsp, rbp",
+				"    pop rbp",
+				"    ret",
+				"",
+			},
+		},
 	}
 	for _, tt := range testcases {
 		t.Run(tt.title, func(t *testing.T) {
