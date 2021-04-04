@@ -31,19 +31,24 @@ func (p *TParser) consume(s string) bool {
 }
 
 func (p *TParser) Parse() (*Node, error) {
-	node, err := p.program()
+	node, err := p.stmt()
 	if err != nil {
 		return nil, err
 	}
 	return node, nil
 }
 
-func (p *TParser) program() (*Node, error) {
-	node, err := p.stmt()
-	if err != nil {
-		return nil, xerrors.Errorf("failed to parse program. cause: %w", err)
+// Program は、複数のStatementを含むプログラムソースコードをparseし、1つのStatementを1つのNodeとするスライスとして返す.
+func (p *TParser) Program() ([]*Node, error) {
+	var result []*Node
+	for p.token.kind != TKEOF {
+		node, err := p.stmt()
+		if err != nil {
+			return result, xerrors.Errorf("failed to parse program. cause: %w", err)
+		}
+		result = append(result, node)
 	}
-	return node, nil
+	return result, nil
 }
 
 func (p *TParser) stmt() (*Node, error) {

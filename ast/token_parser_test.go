@@ -335,3 +335,59 @@ func TestTParser_InvalidSource(t *testing.T) {
 		})
 	}
 }
+
+func TestTParser_Program(t *testing.T) {
+	testcases := [...]struct {
+		title  string
+		source string
+		expect []*ast.Node
+	}{
+		{
+			title:  "simple",
+			source: "0;1;",
+			expect: []*ast.Node{
+				{
+					Kind:  ast.Num,
+					Value: 0,
+				},
+				{
+					Kind:  ast.Num,
+					Value: 1,
+				},
+			},
+		},
+		{
+			title:  "3 statements",
+			source: "1;2;1;",
+			expect: []*ast.Node{
+				{
+					Kind:  ast.Num,
+					Value: 1,
+				},
+				{
+					Kind:  ast.Num,
+					Value: 2,
+				},
+				{
+					Kind:  ast.Num,
+					Value: 1,
+				},
+			},
+		},
+	}
+	for _, tt := range testcases {
+		t.Run(tt.title, func(t *testing.T) {
+			p, err := ast.NewTParser(tt.source)
+			if err != nil {
+				t.Errorf("[%q, %q] expect error to be nil but got:\n %+v while creating parser", tt.title, tt.source, err)
+			}
+			got, err := p.Program()
+			if err != nil {
+				t.Errorf("[%q, %q] expect error to be nil but got %+v", tt.title, tt.source, err)
+			}
+			if diff := cmp.Diff(got, tt.expect); diff != "" {
+				t.Errorf("input: %s\ndiffers: (-got +expect)\n%s\n", tt.source, diff)
+			}
+		})
+	}
+}
