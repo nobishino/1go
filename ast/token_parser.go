@@ -31,9 +31,28 @@ func (p *TParser) consume(s string) bool {
 }
 
 func (p *TParser) Parse() (*Node, error) {
-	node, err := p.expr()
+	node, err := p.program()
 	if err != nil {
 		return nil, err
+	}
+	return node, nil
+}
+
+func (p *TParser) program() (*Node, error) {
+	node, err := p.stmt()
+	if err != nil {
+		return nil, xerrors.Errorf("failed to parse program. cause: %w", err)
+	}
+	return node, nil
+}
+
+func (p *TParser) stmt() (*Node, error) {
+	node, err := p.expr()
+	if err != nil {
+		return nil, xerrors.Errorf("failed to parse statement. cause: %w", err)
+	}
+	if err := p.expect(";"); err != nil {
+		return nil, xerrors.Errorf("failed to parse statement. cause: %w", err)
 	}
 	return node, nil
 }
@@ -258,4 +277,11 @@ func (p *TParser) expectNumber() (*Node, error) {
 	p.token = p.token.next
 	p.pos++
 	return node, nil
+}
+
+func (p *TParser) expect(s string) error {
+	if !p.consume(s) {
+		return xerrors.Errorf("expect %q but got %v", s, p.token)
+	}
+	return nil
 }
