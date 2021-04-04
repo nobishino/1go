@@ -141,6 +141,26 @@ func TestTokenizeToLinkedList(t *testing.T) {
 				},
 			},
 		},
+		{
+			title:  "1;1",
+			source: "1;1",
+			expect: &Token{
+				kind: TKNum,
+				val:  1,
+				str:  "1",
+				next: &Token{
+					kind: TKReserved,
+					str:  ";",
+					len:  1,
+					next: &Token{
+						kind: TKNum,
+						val:  1,
+						str:  "1",
+						next: &Token{kind: TKEOF},
+					},
+				},
+			},
+		},
 	}
 	for _, tt := range testcases {
 		t.Run(tt.title, func(t *testing.T) {
