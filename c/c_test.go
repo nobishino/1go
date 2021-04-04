@@ -187,7 +187,7 @@ func readTestFile(t *testing.T, path string) string {
 func TestCompileAST(t *testing.T) {
 	testcases := [...]struct {
 		title  string
-		in     *ast.Node
+		in     []*ast.Node
 		expect []string
 	}{
 		{
@@ -197,9 +197,11 @@ func TestCompileAST(t *testing.T) {
 		},
 		{
 			title: "1",
-			in: &ast.Node{
-				Kind:  ast.Num,
-				Value: 1,
+			in: []*ast.Node{
+				{
+					Kind:  ast.Num,
+					Value: 1,
+				},
 			},
 			expect: []string{
 				".intel_syntax noprefix",
@@ -219,28 +221,30 @@ func TestCompileAST(t *testing.T) {
 		},
 		{
 			title: "2*3-4/2",
-			in: &ast.Node{
-				Kind: ast.Sub,
-				Lhs: &ast.Node{
-					Kind: ast.Mul,
+			in: []*ast.Node{
+				{
+					Kind: ast.Sub,
 					Lhs: &ast.Node{
-						Kind:  ast.Num,
-						Value: 2,
+						Kind: ast.Mul,
+						Lhs: &ast.Node{
+							Kind:  ast.Num,
+							Value: 2,
+						},
+						Rhs: &ast.Node{
+							Kind:  ast.Num,
+							Value: 3,
+						},
 					},
 					Rhs: &ast.Node{
-						Kind:  ast.Num,
-						Value: 3,
-					},
-				},
-				Rhs: &ast.Node{
-					Kind: ast.Div,
-					Lhs: &ast.Node{
-						Kind:  ast.Num,
-						Value: 4,
-					},
-					Rhs: &ast.Node{
-						Kind:  ast.Num,
-						Value: 2,
+						Kind: ast.Div,
+						Lhs: &ast.Node{
+							Kind:  ast.Num,
+							Value: 4,
+						},
+						Rhs: &ast.Node{
+							Kind:  ast.Num,
+							Value: 2,
+						},
 					},
 				},
 			},

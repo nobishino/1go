@@ -42,7 +42,7 @@ func Compile(src string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	parsed, err := p.Parse()
+	parsed, err := p.Program()
 	if err != nil {
 		return "", err
 	}
@@ -103,8 +103,8 @@ func Validate(src string) error {
 	return nil
 }
 
-func Gen(node *ast.Node) []string {
-	if node == nil {
+func Gen(nodes []*ast.Node) []string {
+	if nodes == nil {
 		return nil
 	}
 	result := []string{
@@ -113,11 +113,13 @@ func Gen(node *ast.Node) []string {
 		"",
 		"main:",
 	}
-	result = append(result, prologue...)
-	result = append(result, genAST(node)...)
-	result = append(result,
-		"    pop rax",
-	)
+	for _, node := range nodes {
+		result = append(result, prologue...)
+		result = append(result, genAST(node)...)
+		result = append(result,
+			"    pop rax",
+		)
+	}
 	result = append(result, epilogue...)
 	result = append(result, "")
 	return result
