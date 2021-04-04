@@ -341,6 +341,7 @@ func TestTParser_Program(t *testing.T) {
 		title  string
 		source string
 		expect []*ast.Node
+		retErr bool
 	}{
 		{
 			title:  "simple",
@@ -374,6 +375,11 @@ func TestTParser_Program(t *testing.T) {
 				},
 			},
 		},
+		{
+			title:  "missing semicolon",
+			source: "1;2;1",
+			retErr: true,
+		},
 	}
 	for _, tt := range testcases {
 		t.Run(tt.title, func(t *testing.T) {
@@ -382,10 +388,10 @@ func TestTParser_Program(t *testing.T) {
 				t.Errorf("[%q, %q] expect error to be nil but got:\n %+v while creating parser", tt.title, tt.source, err)
 			}
 			got, err := p.Program()
-			if err != nil {
-				t.Errorf("[%q, %q] expect error to be nil but got %+v", tt.title, tt.source, err)
+			if err != nil != tt.retErr {
+				t.Errorf("[%q, %q] expect err != nil = %t but got %+v", tt.title, tt.source, tt.retErr, err)
 			}
-			if diff := cmp.Diff(got, tt.expect); diff != "" {
+			if diff := cmp.Diff(got, tt.expect); !tt.retErr && diff != "" {
 				t.Errorf("input: %s\ndiffers: (-got +expect)\n%s\n", tt.source, diff)
 			}
 		})
