@@ -2,6 +2,8 @@ package ast
 
 import (
 	"strconv"
+
+	"golang.org/x/xerrors"
 )
 
 type TokenKind int
@@ -36,9 +38,26 @@ type Token struct {
 	len  int    // トークン文字列の長さ。TKReservedの場合のみ >0
 }
 
-// var token *Token // 現在着目しているトークン. 連結リスト構造を持つ
+// 新しいIDENT Tokenを作成してcurにつなげる
+func newIdentToken(cur *Token, str string) (*Token, error) {
+	// validation
+	for i, r := range str {
+		if !isLatin(r) {
+			return nil, xerrors.Errorf("%q is not a latin character which is illegal as variable name, %dth charachter of %q",
+				r, i+1, str)
+		}
+	}
+	new := &Token{
+		kind: TKIDENT,
+		str:  str,
+		len:  len(str),
+		// TODO: lenは設定する必要があるか？
+	}
+	cur.next = new
+	return new, nil
+}
 
-// 新しいTokenを作成してtokenにつなげる
+// 新しい数値Tokenを作成してcurにつなげる
 func newNumToken(cur *Token, str string) (*Token, error) {
 	new := &Token{
 		kind: TKNum,
@@ -117,9 +136,19 @@ func tokenize(src string) (*Token, error) {
 			rs = rs[len(reservedWord):]
 			continue
 		}
-		if len(rs) > 0 && 'a' <= rs[0] && rs[0] <= 'z' { // 1文字変数にマッチする場合
-			cur = newToken(TKIDENT, cur, string(rs[:1]))
-			rs = rs[1:]
+		// if len(rs) > 0 && 'a' <= rs[0] && rs[0] <= 'z' { // 1文字変数にマッチする場合
+		// 	cur = newToken(TKIDENT, cur, string(rs[:1]))
+		// 	rs = rs[1:]
+		// 	continue
+		// }
+
+		if i := readLatin(rs); i > 0 {
+			c, err := newIdentToken(cur, string(rs[:i]))
+			if err != nil {
+				return nil, xerrors.Errorf("failed to read IDENT Token. cause: %w", err)
+			}
+			cur = c
+			rs = rs[i:]
 			continue
 		}
 
@@ -149,6 +178,26 @@ func readDigit(rs []rune) int {
 		i++
 	}
 	return i
+}
+
+// 何桁目までがラテン文字 'a'-'z'及び'A'-'Z'であるかを返す
+func readLatin(rs []rune) int {
+	var i int
+	for i < len(rs) && isLatin(rs[i]) {
+		i++
+	}
+	return i
+}
+
+// isLatin は、rがラテン文字である時にtrueを返す
+func isLatin(r rune) bool {
+	if 'a' <= r && r <= 'z' {
+		return true
+	}
+	if 'A' <= r && r <= 'Z' {
+		return true
+	}
+	return false
 }
 
 var digits = map[rune]bool{

@@ -161,6 +161,16 @@ func TestTokenizeToLinkedList(t *testing.T) {
 				},
 			},
 		},
+		{
+			title:  "複数文字変数",
+			source: "ab",
+			expect: &Token{
+				kind: TKIDENT,
+				str:  "ab",
+				len:  2,
+				next: &Token{kind: TKEOF},
+			},
+		},
 	}
 	for _, tt := range testcases {
 		t.Run(tt.title, func(t *testing.T) {
