@@ -181,10 +181,6 @@ func (p *TParser) add() (*Node, error) {
 	return node, nil
 }
 
-// func (p *TParser) equality() (*Node,  error) {
-
-// }
-
 func (p *TParser) mul() (*Node, error) {
 	node, err := p.unary()
 	if err != nil {
