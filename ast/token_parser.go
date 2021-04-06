@@ -9,6 +9,7 @@ import (
 type TParser struct {
 	token *Token
 	pos   int
+	lvar  *LVar
 }
 
 func NewTParser(src string) (*TParser, error) {
@@ -285,4 +286,28 @@ func (p *TParser) expect(s string) error {
 		return xerrors.Errorf("expect %q but got %v", s, p.token)
 	}
 	return nil
+}
+
+// 指定されたtokenに合致するローカル変数をすでに定義されたローカル変数から検索する。
+// 存在しなければnilを返す。
+func (p *TParser) findLVar(token *Token) *LVar {
+	if token.kind != TKIDENT {
+		return nil
+	}
+	lvar := p.lvar
+	for lvar != nil {
+		if lvar.name == token.str {
+			return lvar
+		}
+		lvar = lvar.next
+	}
+	return nil
+}
+
+// LVar は、ローカル変数の集まりを管理するための連結リスト
+type LVar struct {
+	name   string // 変数名
+	len    int    // nameの長さ
+	offset int    // 変数に割り当てるスタック領域のBase Pointerからのoffset
+	next   *LVar  // 1つ前に定義されたLVarへのポインタ
 }
