@@ -259,9 +259,9 @@ func (p *TParser) parseIfIdentifier() (*Node, bool) {
 	if len(name) == 0 {
 		return nil, false
 	}
-	char := rune(name[0])
 	// 初めて現れたローカル変数名である場合は登録する
-	if p.findLVar(p.token) == nil {
+	lvar := p.findLVar(p.token)
+	if lvar == nil {
 		newLVar := &LVar{
 			name:   name,
 			len:    len(name),
@@ -269,12 +269,13 @@ func (p *TParser) parseIfIdentifier() (*Node, bool) {
 			offset: p.lvar.offset + 8,
 		}
 		p.lvar = newLVar
+		lvar = newLVar
 	}
 	p.token = p.token.next
 	return &Node{
 		Kind:   LocalVar,
 		Name:   name,
-		Offset: 8 * int(char-'a'+1),
+		Offset: lvar.offset,
 	}, true
 }
 
