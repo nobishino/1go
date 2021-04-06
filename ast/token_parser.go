@@ -19,6 +19,7 @@ func NewTParser(src string) (*TParser, error) {
 	}
 	return &TParser{
 		token: t,
+		lvar:  &LVar{}, // offset = 0 で name == ""のダミーローカル変数を設定しておく
 	}, nil
 }
 
