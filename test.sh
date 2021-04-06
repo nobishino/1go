@@ -42,6 +42,6 @@ assert 1 '2>=1;'
 assert 1 '1>=1;'
 assert 0 '0>=1;'
 assert 1 'a=1;'
-assert 2 'b=1;a=2;'
+assert 2 'result=1;a=2;'
 
 echo OK
