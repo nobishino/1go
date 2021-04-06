@@ -174,7 +174,7 @@ func isSpace(r rune) bool {
 // 何桁目まで数値であるかを返す
 func readDigit(rs []rune) int {
 	var i int
-	for i < len(rs) && digits[rs[i]] {
+	for i < len(rs) && isDigit(rs[i]) {
 		i++
 	}
 	return i
@@ -200,20 +200,6 @@ func isLatin(r rune) bool {
 	return false
 }
 
-var digits = map[rune]bool{
-	'0': true,
-	'1': true,
-	'2': true,
-	'3': true,
-	'4': true,
-	'5': true,
-	'6': true,
-	'7': true,
-	'8': true,
-	'9': true,
-}
-
 func isDigit(r rune) bool {
-	_, ok := digits[r]
-	return ok
+	return '0' <= r && r <= '9'
 }
