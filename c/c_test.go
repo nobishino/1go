@@ -313,7 +313,7 @@ func TestCompileAST(t *testing.T) {
 	}
 	for _, tt := range testcases {
 		t.Run(tt.title, func(t *testing.T) {
-			got := c.Gen(tt.in)
+			got := c.Gen(tt.in, 208)
 			if diff := cmp.Diff(got, tt.expect); diff != "" {
 				t.Errorf("differs: (-got +expect)\n%s", diff)
 			}

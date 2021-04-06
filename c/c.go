@@ -46,7 +46,7 @@ func Compile(src string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	result := Gen(parsed)
+	result := Gen(parsed, p.GetOffset())
 	return strings.Join(result, "\n"), nil
 }
 
@@ -103,7 +103,7 @@ func Validate(src string) error {
 	return nil
 }
 
-func Gen(nodes []*ast.Node) []string {
+func Gen(nodes []*ast.Node, offset int) []string {
 	if nodes == nil {
 		return nil
 	}
@@ -113,7 +113,7 @@ func Gen(nodes []*ast.Node) []string {
 		"",
 		"main:",
 	}
-	result = append(result, prologue...)
+	result = append(result, genPrologue(offset)...)
 	for _, node := range nodes {
 		result = append(result, genAST(node)...)
 		result = append(result,
@@ -123,6 +123,15 @@ func Gen(nodes []*ast.Node) []string {
 	result = append(result, epilogue...)
 	result = append(result, "")
 	return result
+}
+
+// 指定したローカル変数オフセットから関数プロローグを生成する
+func genPrologue(offset int) []string {
+	return []string{
+		"    push rbp",                         // 関数呼び出し前(callerの関数の実行時の)RBPレジスタの値をスタックに保存する
+		"    mov rbp, rsp",                     // この関数の実行中に基準点とするメモリアドレスをRBPレジスタにセットする
+		fmt.Sprintf("    sub rsp, %d", offset), // 8 x 26 bit をこの関数呼び出しインスタンスのローカル変数領域としてスタック領域に確保する
+	}
 }
 
 func genAST(node *ast.Node) []string {

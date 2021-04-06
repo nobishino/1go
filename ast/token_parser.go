@@ -23,6 +23,12 @@ func NewTParser(src string) (*TParser, error) {
 	}, nil
 }
 
+// 仮実装。全体で1つの関数＝ローカル変数空間しか存在しないという前提でParserがoffsetを返すようにしておく
+// FIXME
+func (p *TParser) GetOffset() int {
+	return p.lvar.offset
+}
+
 func (p *TParser) consume(s string) bool {
 	if p.token.kind != TKReserved || p.token.str != s {
 		return false
