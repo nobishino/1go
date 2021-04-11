@@ -136,11 +136,6 @@ func tokenize(src string) (*Token, error) {
 			rs = rs[len(reservedWord):]
 			continue
 		}
-		// if len(rs) > 0 && 'a' <= rs[0] && rs[0] <= 'z' { // 1文字変数にマッチする場合
-		// 	cur = newToken(TKIDENT, cur, string(rs[:1]))
-		// 	rs = rs[1:]
-		// 	continue
-		// }
 
 		if i := readLatin(rs); i > 0 {
 			c, err := newIdentToken(cur, string(rs[:i]))
