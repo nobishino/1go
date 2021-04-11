@@ -13,6 +13,7 @@ const (
 	TKNum
 	TKEOF
 	TKIDENT
+	TKReturn // returnを表す専用トークン
 )
 
 func (tk TokenKind) String() string {
@@ -122,6 +123,10 @@ func tokenize(src string) (*Token, error) {
 			rs = rs[1:]
 			continue
 		}
+		if isReturn(rs) {
+			cur = newToken(TKReturn, cur, returnWord)
+			rs = rs[len(returnWord):]
+		}
 		reservedWord := func() string {
 			if len(rs) > 1 && reserved[2][string(rs[:2])] {
 				return string(rs[:2])
@@ -197,4 +202,32 @@ func isLatin(r rune) bool {
 
 func isDigit(r rune) bool {
 	return '0' <= r && r <= '9'
+}
+
+// rがトークンを構成する文字であるかどうかを判定する。
+// 具体的には英数字または_であるときにtrueを返し、それ以外のときにfalseを返す
+func isAlnum(r rune) bool {
+	return 'a' <= r && r <= 'z' ||
+		'A' <= r && r <= 'Z' ||
+		'0' <= r && r <= '9' ||
+		r == '_'
+}
+
+// return tokenを表すソースコード文字列
+const returnWord = "return"
+
+// rsの先頭に現れるtokenがTKReturnであるときtrue、それ以外のときfalseを返す。
+func isReturn(rs []rune) bool {
+	if len(rs) < 6 {
+		return false
+	}
+	if string(rs[:len(returnWord)]) != returnWord {
+		return false
+	}
+	// returnxなどの場合はIdentifierとして扱わなければならないのでfalseを返す。
+	// そのためreturnの次の文字までチェックする
+	if len(rs) > len(returnWord) && isAlnum(rs[len(returnWord)]) {
+		return false
+	}
+	return true
 }
