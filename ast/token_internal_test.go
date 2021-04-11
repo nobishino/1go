@@ -186,6 +186,21 @@ func TestTokenizeToLinkedList(t *testing.T) {
 				},
 			},
 		},
+		{
+			title:  "returnxy;は識別子になる",
+			source: "returnxy;",
+			expect: &Token{
+				kind: TKIDENT,
+				str:  "returnxy",
+				len:  8,
+				next: &Token{
+					kind: TKReserved,
+					str:  ";",
+					len:  1,
+					next: &Token{kind: TKEOF},
+				},
+			},
+		},
 	}
 	for _, tt := range testcases {
 		t.Run(tt.title, func(t *testing.T) {
