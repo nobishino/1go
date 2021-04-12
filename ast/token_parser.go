@@ -60,12 +60,22 @@ func (p *TParser) Program() ([]*Node, error) {
 }
 
 func (p *TParser) stmt() (*Node, error) {
+	if p.consumeReturn() {
+		node, err := p.expr()
+		if err != nil {
+			return nil, xerrors.Errorf("failed to parse return statement. cause:\n%w", err)
+		}
+		if err := p.expect(";"); err != nil {
+			return nil, xerrors.Errorf("failed to parse return statement. cause:\n%w", err)
+		}
+		return NewNode(Return, node, nil), nil
+	}
 	node, err := p.expr()
 	if err != nil {
-		return nil, xerrors.Errorf("failed to parse statement. cause: %w", err)
+		return nil, xerrors.Errorf("failed to parse statement. cause:\n%w", err)
 	}
 	if err := p.expect(";"); err != nil {
-		return nil, xerrors.Errorf("failed to parse statement. cause: %w", err)
+		return nil, xerrors.Errorf("failed to parse statement. cause:\n%w", err)
 	}
 	return node, nil
 }
@@ -320,6 +330,15 @@ func (p *TParser) findLVar(token *Token) *LVar {
 		lvar = lvar.next
 	}
 	return nil
+}
+
+func (p *TParser) consumeReturn() bool {
+	if p.token.kind != TKReturn {
+		return false
+	}
+	p.token = p.token.next
+	p.pos++
+	return true
 }
 
 // LVar は、ローカル変数の集まりを管理するための連結リスト

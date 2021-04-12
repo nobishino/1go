@@ -380,6 +380,19 @@ func TestTParser_Program(t *testing.T) {
 			source: "1;2;1",
 			retErr: true,
 		},
+		{
+			title:  "return statement",
+			source: "return 1;",
+			expect: []*ast.Node{
+				{
+					Kind: ast.Return,
+					Lhs: &ast.Node{
+						Kind:  ast.Num,
+						Value: 1,
+					},
+				},
+			},
+		},
 	}
 	for _, tt := range testcases {
 		t.Run(tt.title, func(t *testing.T) {

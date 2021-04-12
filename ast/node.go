@@ -28,6 +28,7 @@ const (
 	GE       Kind = "GreaterThanOrEqual"
 	Assign   Kind = "Assignment"
 	LocalVar Kind = "Identifier"
+	Return   Kind = "Return"
 )
 
 func NewNode(k Kind, lhs, rhs *Node) *Node {

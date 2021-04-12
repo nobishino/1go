@@ -126,6 +126,7 @@ func tokenize(src string) (*Token, error) {
 		if isReturn(rs) {
 			cur = newToken(TKReturn, cur, returnWord)
 			rs = rs[len(returnWord):]
+			continue
 		}
 		reservedWord := func() string {
 			if len(rs) > 1 && reserved[2][string(rs[:2])] {

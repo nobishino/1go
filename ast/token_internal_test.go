@@ -187,6 +187,26 @@ func TestTokenizeToLinkedList(t *testing.T) {
 			},
 		},
 		{
+			title:  "return 1;",
+			source: "return 1;",
+			expect: &Token{
+				kind: TKReturn,
+				str:  "return",
+				len:  6,
+				next: &Token{
+					kind: TKNum,
+					str:  "1",
+					val:  1,
+					next: &Token{
+						kind: TKReserved,
+						str:  ";",
+						len:  1,
+						next: &Token{kind: TKEOF},
+					},
+				},
+			},
+		},
+		{
 			title:  "returnxy;は識別子になる",
 			source: "returnxy;",
 			expect: &Token{
