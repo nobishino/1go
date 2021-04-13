@@ -169,6 +169,9 @@ func genAST(node *ast.Node) []string {
 		result = append(result, pushMemAddr...)
 		result = append(result, genAST(node.Rhs)...)  // 右辺のノードを評価する
 		result = append(result, assignRightToLeft...) // 代入命令を生成する
+	case ast.Return:
+		result = append(result, genAST(node.Lhs)...)
+		result = append(result, ret...)
 	}
 	return result
 }
@@ -270,6 +273,14 @@ var prologue = []string{
 }
 
 var epilogue = []string{
+	"    mov rsp, rbp", // ベースポインタの位置までRSPを戻してくる。これによりローカル変数領域が「捨てられる」
+	"    pop rbp",      // 1つ上の関数に対するベースの値をRBPに書き戻す。このpop命令の後、RSPはこの関数のリターンアドレスが書き込まれたメモリアドレスを指している
+	"    ret",          // Stackからpopし、そのpopした値のメモリアドレスに移動する。
+}
+
+// return文のNodeのgenerate結果
+var ret = []string{
+	"    pop rax",      // 直前に積まれた値=return x;のxの評価結果をraxにpopする
 	"    mov rsp, rbp", // ベースポインタの位置までRSPを戻してくる。これによりローカル変数領域が「捨てられる」
 	"    pop rbp",      // 1つ上の関数に対するベースの値をRBPに書き戻す。このpop命令の後、RSPはこの関数のリターンアドレスが書き込まれたメモリアドレスを指している
 	"    ret",          // Stackからpopし、そのpopした値のメモリアドレスに移動する。
