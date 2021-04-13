@@ -170,7 +170,6 @@ func genAST(node *ast.Node) []string {
 		result = append(result, genAST(node.Rhs)...)  // 右辺のノードを評価する
 		result = append(result, assignRightToLeft...) // 代入命令を生成する
 	case ast.Return:
-		result = append(result, genAST(node.Lhs)...)
 		result = append(result, ret...)
 	}
 	return result

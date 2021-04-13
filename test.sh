@@ -44,5 +44,6 @@ assert 0 '0>=1;'
 assert 1 'a=1;'
 assert 2 'result=1;a=2;'
 assert 3 'b=1;return 3;'
+assert 5 'return 5;return 8;'
 
 echo OK
