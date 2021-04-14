@@ -116,9 +116,6 @@ func Gen(nodes []*ast.Node, offset int) []string {
 	result = append(result, genPrologue(offset)...)
 	for _, node := range nodes {
 		result = append(result, genAST(node)...)
-		result = append(result,
-			"    pop rax",
-		)
 	}
 	result = append(result, epilogue...)
 	result = append(result, "")
@@ -272,6 +269,7 @@ var prologue = []string{
 }
 
 var epilogue = []string{
+	"    pop rax",      // 直前に積まれた値をraxにpopする
 	"    mov rsp, rbp", // ベースポインタの位置までRSPを戻してくる。これによりローカル変数領域が「捨てられる」
 	"    pop rbp",      // 1つ上の関数に対するベースの値をRBPに書き戻す。このpop命令の後、RSPはこの関数のリターンアドレスが書き込まれたメモリアドレスを指している
 	"    ret",          // Stackからpopし、そのpopした値のメモリアドレスに移動する。

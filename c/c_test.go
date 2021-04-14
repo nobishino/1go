@@ -301,7 +301,6 @@ func TestCompileAST(t *testing.T) {
 				"    mov rbp, rsp",
 				"    sub rsp, 208",
 				"    push 1",
-				"    pop rax",
 				"    push 2",
 				"    pop rax",
 				"    mov rsp, rbp",
